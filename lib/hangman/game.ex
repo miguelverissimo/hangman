@@ -17,7 +17,9 @@ defmodule Hangman.Game do
   end
 
   def new_game() do
-    new_game(Dictionary.get_random_word())
+    Dictionary.start()
+    |> Dictionary.random_word()
+    |> new_game()
   end
 
   def make_move(game = %Game{game_state: state}, _guess) when state in [:won, :lost], do: game
