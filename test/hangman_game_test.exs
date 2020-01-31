@@ -14,27 +14,27 @@ defmodule Hangman.GameTest do
   test "state does not change if game_sate is :won or :lost" do
     for state <- [:won, :lost] do
       game = %{Game.new_game() | game_state: state}
-      assert ^game = Game.make_move(game, "x")
+      assert {^game, _} = Game.make_move(game, "x")
     end
   end
 
   test "first occurrence of letter is not already used" do
     game = Game.new_game()
-    game = Game.make_move(game, "x")
+    {game, _tally} = Game.make_move(game, "x")
     assert game.game_state != :already_used
   end
 
   test "second occurrence of letter is already used" do
     game = Game.new_game()
-    game = Game.make_move(game, "x")
+    {game, _tally} = Game.make_move(game, "x")
     assert game.game_state != :already_used
-    game = Game.make_move(game, "x")
+    {game, _tally} = Game.make_move(game, "x")
     assert game.game_state == :already_used
   end
 
   test "a good guess is recognized" do
     game = Game.new_game("bazoooka")
-    game = Game.make_move(game, "b")
+    {game, _tally} = Game.make_move(game, "b")
     assert game.game_state == :good_guess
     assert game.turns_left == 7
   end
@@ -51,7 +51,7 @@ defmodule Hangman.GameTest do
     game = Game.new_game("bazoooka")
 
     Enum.reduce(moves, game, fn {guess, state}, game ->
-      game = Game.make_move(game, guess)
+      {game, _tally} = Game.make_move(game, guess)
       assert game.game_state == state
       assert game.turns_left == 7
       game
@@ -60,7 +60,7 @@ defmodule Hangman.GameTest do
 
   test "a bad guess is recognized" do
     game = Game.new_game("bazoooka")
-    game = Game.make_move(game, "x")
+    {game, _tally} = Game.make_move(game, "x")
     assert game.game_state == :bad_guess
     assert game.turns_left == 6
   end
@@ -79,7 +79,7 @@ defmodule Hangman.GameTest do
     game = Game.new_game("foo")
 
     Enum.reduce(moves, game, fn {guess, state, turns_left}, game ->
-      game = Game.make_move(game, guess)
+      {game, _tally} = Game.make_move(game, guess)
       assert game.game_state == state
       assert game.turns_left == turns_left
       game
@@ -105,7 +105,7 @@ defmodule Hangman.GameTest do
     game = Game.new_game("bazoooka")
 
     Enum.reduce(moves, game, fn {guess, state, turns_left, letters}, game ->
-      game = Game.make_move(game, guess)
+      {game, _tally} = Game.make_move(game, guess)
       tally = Game.tally(game)
       assert tally.game_state == state
       assert tally.turns_left == turns_left
